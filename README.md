@@ -45,15 +45,5 @@ python manage.py runserver 0.0.0.0:8000
 
 ## Usage
 
-Importar o Arquivo tembici.postman_collection.json
-
-### Script Postman
-
-* Get Token: Enviando um Json com Username e password retorna o access Token.
-* Get Travels: Passando no Token no Cabeçalho, Retorna todas as viagens do Usuario.
-* Update Rank: Enviando um Json com o campos a ser atualizado, irá atualizar a viagem que esta parametrizado na URL.
-* Get a Travel: Passando o Id da viagem na URL, ele retorna os detalhes.
-
-### Detalhes
-
-Todas as chamadas devem ser parametrizado no Headers o Token do usuario obtido em Get Token.
+See Documentation:
+[Documentation](https://documenter.getpostman.com/view/3762241/Szf9USGF?version=latest)
