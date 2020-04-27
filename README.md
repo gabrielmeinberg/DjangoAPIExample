@@ -1,7 +1,5 @@
-# Desafio Backend tembici
-
-## Django Project Example  
-A simple Api to Simulate a Web Store Api  
+# Django Project Example  
+## A simple Api to Simulate a Web Store Api  
 
 
 ## Environment
