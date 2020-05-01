@@ -21,7 +21,7 @@ class ProductViewTest(APITestCase):
         self.view = ProductView.as_view()
         self.product = Product.objects.create(
             name='Product 1', description='Description 1')
-        self.price = Price.objects.create(price=2.42, product=self.product)
+        self.price = Price.objects.create(price=2.42, currency='BRL', product=self.product)
 
     def test_product_create(self):
 
@@ -44,8 +44,10 @@ class ProductViewTest(APITestCase):
             'id': self.product.id,
             'name': self.product.name,
             'description': self.product.description,
+            'highlighted': False,
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'price': self.product.price
+            'price': self.product.price,
+            'currency': self.product.currency
         }
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.data, expect_response)
@@ -69,10 +71,11 @@ class ProductViewTest(APITestCase):
             'id': self.product.id,
             'name': 'Update Name',
             'description': 'Update Description',
+            'highlighted': False,
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'price': 2.42
+            'price': 2.42,
+            'currency': 'BRL'
         }
-
         self.assertEquals(response.data, expect_response)
 
     def test_product_delete(self):

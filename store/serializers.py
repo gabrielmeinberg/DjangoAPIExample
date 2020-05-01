@@ -9,7 +9,7 @@ class PriceSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = Price
-        fields = ['id', 'price', 'product', 'created_at']
+        fields = ['id', 'price', 'currency', 'product', 'created_at']
         read_only_fields = ['id', 'created_at']
 
 
@@ -18,8 +18,8 @@ class ProductSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'created_at', 'price']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'name', 'description', 'highlighted', 'created_at', 'price', 'currency']
+        read_only_fields = ['id', 'created_at', 'currency']
 
     def create(self, validated_data):
         price_data = validated_data.pop('price')

@@ -27,6 +27,7 @@ class PriceSerializationTest(TestCase):
         response = {
             'id': 1,
             'price': 2.42,
+            'currency': 'BRL',
             'product': 1,
             'created_at': self.price.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         }
@@ -49,9 +50,11 @@ class ProductSerializationTest(TestCase):
             'id': 1,
             'name': 'Product 1',
             'description': 'Description 1',
+            'highlighted': False,
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'price': 2.42
-        }
+            'price': 2.42,
+            'currency': 'BRL'
+            }
         self.assertEqual(self.serializer.data, response)
 
 

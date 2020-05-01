@@ -7,24 +7,18 @@ class Product(models.Model):
 
     name = models.CharField(max_length=120)
     description = models.TextField()
+    highlighted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f'ID: {self.id} Name: {self.name}'
 
     class Meta:
         db_table = 'product_table'
         managed = True
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-
-    @property
-    def price(self):
-        price_get = self.price_set.filter(
-            product=self).order_by('created_at').last()
-        if price_get:
-            return price_get.price
-        return None
+        ordering = ['name']
 
     @property
     def price_instance(self):
@@ -32,9 +26,23 @@ class Product(models.Model):
             product=self).order_by('created_at').last()
         return price_get
 
+    @property
+    def price(self):
+        price_get = self.price_instance
+        if price_get:
+            return price_get.price
+        return None
+
+    @property
+    def currency(self):
+        price_get = self.price_instance
+        if price_get:
+            return price_get.currency
+        return None
 
 class Price(models.Model):
     price = models.FloatField()
+    currency = models.CharField(max_length=3, default='BRL')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
