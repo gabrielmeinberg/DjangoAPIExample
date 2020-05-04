@@ -8,6 +8,7 @@ class Product(models.Model):
     name = models.CharField(max_length=120)
     description = models.TextField()
     highlighted = models.BooleanField(default=False)
+    unit = models.CharField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
@@ -61,7 +62,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        pass
+        return  f'ID: {self.id} Client: {self.client}'
 
     class Meta:
         db_table = 'order_table'
@@ -78,7 +79,7 @@ class OrderProducts(models.Model):
     quantity = models.IntegerField()
 
     def __str__(self):
-        pass
+        return f'Order: {self.order}'
 
     class Meta:
         db_table = 'order_products_table'

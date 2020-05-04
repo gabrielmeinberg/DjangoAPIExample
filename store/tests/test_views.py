@@ -29,7 +29,8 @@ class ProductViewTest(APITestCase):
         product_json = {
             "name": "Product Test",
             "description": "Product Description",
-            "price":  2.42
+            "price":  2.42,
+            "unit": "1 Porcao"
         }
         request = self.factory.post(url, product_json, format='json')
         response = self.view(request)
@@ -47,7 +48,8 @@ class ProductViewTest(APITestCase):
             'highlighted': False,
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'price': self.product.price,
-            'currency': self.product.currency
+            'currency': self.product.currency,
+            'unit': self.product.unit
         }
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.data, expect_response)
@@ -74,7 +76,8 @@ class ProductViewTest(APITestCase):
             'highlighted': False,
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'price': 2.42,
-            'currency': 'BRL'
+            'currency': 'BRL',
+            'unit': ''
         }
         self.assertEquals(response.data, expect_response)
 
