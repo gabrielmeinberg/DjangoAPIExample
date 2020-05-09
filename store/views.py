@@ -70,10 +70,14 @@ class OrderView(APIView):
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, pk: int, format=None) -> Response:
+    def get(self, request, pk: int = None, format=None) -> Response:
         try:
-            order = Order.objects.get(id=pk)
-            serializer = OrderSerialization(order, many=False)
+            if pk:
+                order = Order.objects.get(id=pk)
+                serializer = OrderSerialization(order, many=False)
+            else:
+                orders = Order.objects.order_by('-created_at')
+                serializer = OrderSerialization(orders, many=True)
         except:
             raise Http404
 
