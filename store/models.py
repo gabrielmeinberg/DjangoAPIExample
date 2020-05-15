@@ -2,6 +2,19 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'ID: {self.id} Name: {self.name}'
+
+    class Meta:
+        db_table = 'category_table'
+        managed = True
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['name']
+
 
 class Product(models.Model):
 
@@ -10,6 +23,7 @@ class Product(models.Model):
     highlighted = models.BooleanField(default=False)
     unit = models.CharField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    category = models.ForeignKey(Category, related_name='product_category', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'ID: {self.id} Name: {self.name}'
@@ -41,6 +55,7 @@ class Product(models.Model):
             return price_get.currency
         return None
 
+
 class Price(models.Model):
     price = models.FloatField()
     currency = models.CharField(max_length=3, default='BRL')
@@ -62,7 +77,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return  f'ID: {self.id} Client: {self.client}'
+        return f'ID: {self.id} Client: {self.client}'
 
     class Meta:
         db_table = 'order_table'

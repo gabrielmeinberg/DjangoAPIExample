@@ -4,8 +4,7 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from store.models import (
-    Product, Price, Order, OrderProducts)
+from store.models import Category, Order, OrderProducts, Price, Product
 
 
 from store.serializers import (
@@ -38,8 +37,9 @@ class PriceSerializationTest(TestCase):
 class ProductSerializationTest(TestCase):
 
     def setUp(self):
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, product=self.product)
 
         self.serializer = ProductSerialization(self.product, many=False)
@@ -54,7 +54,8 @@ class ProductSerializationTest(TestCase):
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'price': 2.42,
             'currency': 'BRL',
-            'unit': ''
+            'unit': '',
+            'category': self.category.id
             }
         self.assertEqual(self.serializer.data, response)
 

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 
 from rest_framework import serializers
 
-from store.models import (Product, Price, Order, OrderProducts)
+from store.models import (Product, Price, Order, OrderProducts, Category)
 
 
 class PriceSerialization(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class ProductSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'highlighted', 'created_at', 'price', 'currency', 'unit']
+        fields = ['id', 'name', 'description', 'highlighted', 'created_at', 'price', 'currency', 'unit', 'category']
         read_only_fields = ['id', 'created_at', 'currency']
 
     def create(self, validated_data):
@@ -73,3 +73,11 @@ class ClientSerialization(serializers.ModelSerializer):
         group, _ = Group.objects.get_or_create(name='clients')
         group.user_set.add(user)
         return user
+
+
+class CategorySerialization(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
+        read_only_fields = ['id']

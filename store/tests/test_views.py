@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 
 from store.models import (
-    Product, Price, Order, OrderProducts)
+    Product, Price, Order, OrderProducts, Category)
 
 from store.views import ProductView
 
@@ -19,8 +19,9 @@ class ProductViewTest(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = ProductView.as_view()
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, currency='BRL', product=self.product)
 
     def test_product_create(self):
@@ -49,7 +50,8 @@ class ProductViewTest(APITestCase):
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'price': self.product.price,
             'currency': self.product.currency,
-            'unit': self.product.unit
+            'unit': self.product.unit,
+            'category': self.category.id
         }
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.data, expect_response)
@@ -77,7 +79,8 @@ class ProductViewTest(APITestCase):
             'created_at': self.product.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'price': 2.42,
             'currency': 'BRL',
-            'unit': ''
+            'unit': '',
+            'category': 1
         }
         self.assertEquals(response.data, expect_response)
 

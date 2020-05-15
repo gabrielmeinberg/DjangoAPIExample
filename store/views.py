@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from store.models import Product, Price, Order
+from store.models import Product, Price, Order, Category
 from store.serializers import (
     ProductSerialization, PriceSerialization, OrderSerialization,
-    ClientSerialization)
+    ClientSerialization, CategorySerialization)
 
 
 class ProductView(APIView):
@@ -119,3 +119,20 @@ class PriceView(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoryView(APIView):
+    def post(self, request, format=None) -> Response:
+        serializers = CategorySerialization(data=request.data, many=False)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, format=None) -> Response:
+        categories = Category.objects.all()
+        serializer = CategorySerialization(categories, many=True)
+
+        return Response(serializer.data)
+        

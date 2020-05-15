@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from store.models import Product, Price, Order, OrderProducts
+from store.models import Product, Price, Order, OrderProducts, Category
 from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
@@ -20,4 +20,5 @@ class OrderAdmin(admin.ModelAdmin):
 
 admin.site.register(Product)
 admin.site.register(Price)
+admin.site.register(Category)
 
