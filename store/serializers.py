@@ -2,7 +2,8 @@ from django.contrib.auth.models import User, Group
 
 from rest_framework import serializers
 
-from store.models import (Product, Price, Order, OrderProducts, Category)
+from store.models import (
+    Product, Price, Order, OrderProducts, Category, Client)
 
 
 class PriceSerialization(serializers.ModelSerializer):
@@ -18,7 +19,8 @@ class ProductSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'highlighted', 'created_at', 'price', 'currency', 'unit', 'category']
+        fields = ['id', 'name', 'description', 'highlighted',
+                  'created_at', 'price', 'currency', 'unit', 'category']
         read_only_fields = ['id', 'created_at', 'currency']
 
     def create(self, validated_data):
@@ -60,18 +62,29 @@ class OrderSerialization(serializers.ModelSerializer):
 class ClientSerialization(serializers.ModelSerializer):
 
     class Meta:
+        model = Client
+        fields = ['phone', 'address', 'id']
+        read_only_fields = ['id']
+
+
+class UserSerialization(serializers.ModelSerializer):
+    client_set = ClientSerialization(many=True)
+
+    class Meta:
         model = User
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'password']
+                  'last_name', 'email', 'password', 'client_set']
         read_only_fields = ['id']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
     def create(self, validated_data):
+        client_data = validated_data.pop('client_set')
         user = User.objects.create_user(**validated_data)
         group, _ = Group.objects.get_or_create(name='clients')
         group.user_set.add(user)
+        Client.objects.create(user=user, **client_data[0])
         return user
 
 

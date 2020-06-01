@@ -4,12 +4,12 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from store.models import Category, Order, OrderProducts, Price, Product
+from store.models import Category, Order, OrderProducts, Price, Product, Client
 
 
 from store.serializers import (
     ProductSerialization, PriceSerialization, OrderSerialization,
-    ClientSerialization, OrderProductsSerialization)
+    UserSerialization, OrderProductsSerialization)
 
 
 class PriceSerializationTest(TestCase):
@@ -56,18 +56,21 @@ class ProductSerializationTest(TestCase):
             'currency': 'BRL',
             'unit': '',
             'category': self.category.id
-            }
+        }
         self.assertEqual(self.serializer.data, response)
 
 
-class ClientSerializationTest(TestCase):
+class UserSerializationTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
             username='meinreno', email='gabriel@gabriel.com',
             password='top_secret', first_name='Gabriel', last_name='Renó')
 
-        self.serializer = ClientSerialization(self.user, many=False)
+        Client.objects.create(
+            user=self.user, address="Av. Teste, 97", phone="99999-9999")
+
+        self.serializer = UserSerialization(self.user, many=False)
 
     def test_create_client(self):
 
@@ -76,7 +79,13 @@ class ClientSerializationTest(TestCase):
             'username': 'meinreno',
             'first_name': 'Gabriel',
             'last_name': 'Renó',
-            'email': 'gabriel@gabriel.com'}
+            'email': 'gabriel@gabriel.com',
+            'client_set': [
+                {
+                    'phone': '99999-9999',
+                    'address': 'Av. Teste, 97',
+                    'id': 1
+                }]}
 
         self.assertEqual(self.serializer.data, response)
 

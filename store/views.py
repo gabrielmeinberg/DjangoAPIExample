@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from store.models import Product, Price, Order, Category
+from store.models import Product, Price, Order, Category, Client
 from store.serializers import (
     ProductSerialization, PriceSerialization, OrderSerialization,
-    ClientSerialization, CategorySerialization)
+    UserSerialization, CategorySerialization, ClientSerialization)
 
 
 class ProductView(APIView):
@@ -94,7 +94,7 @@ class OrderView(APIView):
 
 class ClientView(APIView):
     def post(self, request, format=None) -> Response:
-        serializers = ClientSerialization(data=request.data, many=False)
+        serializers = UserSerialization(data=request.data, many=False)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data, status=status.HTTP_201_CREATED)
@@ -104,11 +104,23 @@ class ClientView(APIView):
     def get(self, request, pk: int, format=None) -> Response:
         try:
             user = User.objects.get(id=pk)
-            serializer = ClientSerialization(user, many=False)
+            serializer = UserSerialization(user, many=False)
         except:
             raise Http404
 
         return Response(serializer.data)
+
+    def patch(self, request, pk: int, format=None) -> Response:
+        try:
+            client = Client.objects.get(id=pk)
+        except:
+            raise Http404
+
+        serializer = ClientSerialization(
+            client, data=request.data, partial=True, many=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PriceView(APIView):
