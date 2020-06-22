@@ -101,18 +101,18 @@ class ClientView(APIView):
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, pk: int, format=None) -> Response:
+    def get(self, request, format=None) -> Response:
         try:
-            user = User.objects.get(id=pk)
+            user = request.user
             serializer = UserSerialization(user, many=False)
         except:
             raise Http404
 
         return Response(serializer.data)
 
-    def patch(self, request, pk: int, format=None) -> Response:
+    def patch(self, request, format=None) -> Response:
         try:
-            client = Client.objects.get(id=pk)
+            client = request.user.client_set.first()
         except:
             raise Http404
 
