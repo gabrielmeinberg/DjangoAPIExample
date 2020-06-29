@@ -1,5 +1,14 @@
+from uuid import uuid4
+
 from django.contrib.auth.models import User
 from django.db import models
+
+
+def image_name(instance, filename):
+    ext = filename.split('.')[-1]
+
+    return f'images/{uuid4()}.{ext}'
+
 
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,7 +46,9 @@ class Product(models.Model):
     highlighted = models.BooleanField(default=False)
     unit = models.CharField(max_length=15)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    category = models.ForeignKey(Category, related_name='product_category', on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(
+        Category, related_name='product_category', on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to=image_name)
 
     def __str__(self):
         return f'ID: {self.id} Name: {self.name}'
@@ -88,6 +99,8 @@ class Price(models.Model):
 
 class Order(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
+    type_payment = models.CharField(max_length=50)
+    address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):

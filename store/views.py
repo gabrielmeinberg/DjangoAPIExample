@@ -13,8 +13,11 @@ from store.serializers import (
 
 
 class ProductView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializers = ProductSerialization(data=request.data, many=False)
         if serializers.is_valid():
@@ -38,6 +41,9 @@ class ProductView(APIView):
         return Response(serializer.data)
 
     def patch(self, request, pk: int, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             product = Product.objects.get(id=pk)
         except:
@@ -52,6 +58,8 @@ class ProductView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk: int, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             Product.objects.get(id=pk).delete()
@@ -62,8 +70,14 @@ class ProductView(APIView):
 
 
 class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None) -> Response:
-        serializers = OrderSerialization(data=request.data, many=False)
+
+        data = request.data.copy()
+        data['client'] = request.user.id
+
+        serializers = OrderSerialization(data=data, many=False)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data, status=status.HTTP_201_CREATED)
@@ -72,11 +86,12 @@ class OrderView(APIView):
 
     def get(self, request, pk: int = None, format=None) -> Response:
         try:
+
             if pk:
-                order = Order.objects.get(id=pk)
+                order = Order.objects.get(id=pk, client=request.user)
                 serializer = OrderSerialization(order, many=False)
             else:
-                orders = Order.objects.order_by('-created_at')
+                orders = Order.objects.filter(client=request.user).order_by('-created_at')
                 serializer = OrderSerialization(orders, many=True)
         except:
             raise Http404
@@ -84,6 +99,9 @@ class OrderView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk: int, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             Order.objects.get(id=pk).delete()
         except:
@@ -93,6 +111,8 @@ class OrderView(APIView):
 
 
 class ClientView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None) -> Response:
         serializers = UserSerialization(data=request.data, many=False)
         if serializers.is_valid():
@@ -124,7 +144,12 @@ class ClientView(APIView):
 
 
 class PriceView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         serializers = PriceSerialization(data=request.data, many=False)
         if serializers.is_valid():
             serializers.save()
@@ -134,17 +159,21 @@ class PriceView(APIView):
 
 
 class CategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None) -> Response:
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         serializers = CategorySerialization(data=request.data, many=False)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data, status=status.HTTP_201_CREATED)
-        
+
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get(self, request, format=None) -> Response:
         categories = Category.objects.all()
         serializer = CategorySerialization(categories, many=True)
 
         return Response(serializer.data)
-        

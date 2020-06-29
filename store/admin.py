@@ -15,7 +15,7 @@ class OrderProductsInline(admin.StackedInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     save_on_top = True
-    fields = ["client"]
+    fields = ['client', 'type_payment', 'address']
     inlines = [OrderProductsInline]
 
 admin.site.register(Product)
