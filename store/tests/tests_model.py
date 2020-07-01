@@ -5,14 +5,14 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.db.models.query import QuerySet
 
-from store.models import (
-    Product, Price, Order, OrderProducts)
+from store.models import Category, Order, OrderProducts, Price, Product
 
 
 class ProductTestCase(TestCase):
     def setUp(self):
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, product=self.product)
 
     def test_classificacao_get(self):
@@ -36,8 +36,9 @@ class PriceTestCase(TestCase):
 
     def setUp(self):
 
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, product=self.product)
 
     def test_get_price(self):
@@ -70,8 +71,9 @@ class OrderProductsTestCase(TestCase):
 
         self.order = Order.objects.create(client=self.user)
 
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, product=self.product)
 
         self.order_products = OrderProducts.objects.create(
