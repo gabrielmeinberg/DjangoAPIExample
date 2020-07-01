@@ -15,8 +15,9 @@ from store.serializers import (
 class PriceSerializationTest(TestCase):
 
     def setUp(self):
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         self.price = Price.objects.create(price=2.42, product=self.product)
 
         self.serializer = PriceSerialization(self.price, many=False)
@@ -55,8 +56,10 @@ class ProductSerializationTest(TestCase):
             'price': 2.42,
             'currency': 'BRL',
             'unit': '',
-            'category': self.category.id
+            'category': self.category.id,
+            'photo': None
         }
+
         self.assertEqual(self.serializer.data, response)
 
 
@@ -97,29 +100,36 @@ class OrderSerializationTest(TestCase):
             username='meinreno', email='gabriel@gabriel.com',
             password='top_secret', first_name='Gabriel', last_name='Renó')
 
+        self.client = Client.objects.create(
+            user=self.user, phone='1199999-9999', address='Rua Teste')
+
+        self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
-            name='Product 1', description='Description 1')
+            name='Product 1', description='Description 1', category=self.category)
         Price.objects.create(price=2.42, product=self.product)
 
         self.product2 = Product.objects.create(
-            name='Product 2', description='Description 2')
+            name='Product 2', description='Description 2', category=self.category)
         Price.objects.create(price=2.42, product=self.product2)
 
         order_json = {
             "client": self.user.id,
+            "type_payment": "Cartão",
             "order_products": [
                 {
                     "product": self.product.id,
                     "quantity": 10
                 },
+
                 {
                     "product": self.product2.id,
-                    "quantity": 10
+                    "quantity": 20
                 }
             ]
         }
 
         self.serializer = OrderSerialization(data=order_json, many=False)
+
         if self.serializer.is_valid():
             self.serializer.save()
         else:
@@ -147,7 +157,9 @@ class OrderSerializationTest(TestCase):
                         ('order', 1),
                         ('product', 2),
                         ('price', 2.42),
-                        ('quantity', 10)])]
+                        ('quantity', 20)])],
+            'type_payment': 'Cartão',
+            'address': 'Rua Teste'
         }
 
         self.assertEqual(self.serializer.data, response)

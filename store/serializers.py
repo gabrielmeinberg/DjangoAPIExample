@@ -20,8 +20,9 @@ class ProductSerialization(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'highlighted',
-                  'created_at', 'price', 'currency', 'unit', 'category']
-        read_only_fields = ['id', 'created_at', 'currency']
+                  'created_at', 'price', 'currency', 'unit', 'category',
+                  'photo']
+        read_only_fields = ['id', 'created_at', 'currency', 'photo']
 
     def create(self, validated_data):
         price_data = validated_data.pop('price')
@@ -45,12 +46,12 @@ class OrderSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'client', 'created_at', 'order_products']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'client', 'created_at', 'order_products', 'type_payment', 'address']
+        read_only_fields = ['id', 'created_at', 'address']
 
     def create(self, validated_data):
         orders_products_data = validated_data.pop('order_products')
-        order = Order.objects.create(**validated_data)
+        order = Order.objects.create(**validated_data, address=validated_data['client'].client_set.first().address)
         for order_products_data in orders_products_data:
             price = order_products_data['product'].price_instance
 

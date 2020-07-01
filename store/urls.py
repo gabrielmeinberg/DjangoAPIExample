@@ -14,7 +14,7 @@ urlpatterns = [
          views.OrderView.as_view(), name='price-details'),
 
      path('client/', views.ClientView.as_view(), name='price'),
-     path('client/details/<int:pk>/',
+     path('client/details/',
          views.ClientView.as_view(), name='price-details'),
 
      path('category/', views.CategoryView.as_view(), name='category'),

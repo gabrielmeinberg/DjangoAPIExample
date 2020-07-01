@@ -17,12 +17,16 @@ from store.views import ProductView
 class ProductViewTest(APITestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='meinreno', email='gabriel@gabriel.com',
+            password='top_secret', first_name='Gabriel', last_name='Renó', is_staff=True)
         self.factory = APIRequestFactory()
         self.view = ProductView.as_view()
         self.category = Category.objects.create(name='Prato')
         self.product = Product.objects.create(
             name='Product 1', description='Description 1', category=self.category)
-        self.price = Price.objects.create(price=2.42, currency='BRL', product=self.product)
+        self.price = Price.objects.create(
+            price=2.42, currency='BRL', product=self.product)
 
     def test_product_create(self):
 
@@ -31,9 +35,11 @@ class ProductViewTest(APITestCase):
             "name": "Product Test",
             "description": "Product Description",
             "price":  2.42,
-            "unit": "1 Porcao"
+            "unit": "1 Porcao",
+            "category": self.category.id
         }
         request = self.factory.post(url, product_json, format='json')
+        force_authenticate(request, user=self.user)
         response = self.view(request)
         self.assertEquals(response.status_code, 201)
 
@@ -41,6 +47,7 @@ class ProductViewTest(APITestCase):
         url = reverse('product-details', kwargs={'pk': self.product.id})
 
         request = self.factory.get(url)
+        force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.product.id)
         expect_response = {
             'id': self.product.id,
@@ -51,7 +58,8 @@ class ProductViewTest(APITestCase):
             'price': self.product.price,
             'currency': self.product.currency,
             'unit': self.product.unit,
-            'category': self.category.id
+            'category': self.category.id,
+            'photo': None
         }
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.data, expect_response)
@@ -63,12 +71,13 @@ class ProductViewTest(APITestCase):
             'description': 'Update Description',
         }
         request = self.factory.patch(url, data=update_json, format='json')
-
+        force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.product.id)
 
         self.assertEquals(response.status_code, 204)
 
         request = self.factory.get(url)
+        force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.product.id)
 
         expect_response = {
@@ -80,16 +89,17 @@ class ProductViewTest(APITestCase):
             'price': 2.42,
             'currency': 'BRL',
             'unit': '',
-            'category': 1
+            'category': 1,
+            'photo': None
         }
+
         self.assertEquals(response.data, expect_response)
 
     def test_product_delete(self):
         url = reverse('product-details', kwargs={'pk': self.product.id})
 
         request = self.factory.delete(url)
-
+        force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.product.id)
 
         self.assertEquals(response.status_code, 204)
-
