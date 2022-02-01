@@ -5,7 +5,8 @@
 ## Environment
 
 Python 3.8
-Django 3.0.5  
+Django 3.1
+kafka
 [Postman](https://www.postman.com/)
 
 ## Installation
@@ -29,16 +30,6 @@ Install Docker Compose:
 
 ```bash
 docker-compose up -d
-./launch.sh
-```
-
-### Run Local
-
-```bash
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py loaddata viagens/fixtures/inital.json
-python manage.py runserver 0.0.0.0:8000
 ```
 
 ## Usage

@@ -8,3 +8,4 @@ python-decouple==3.3
 boto3==1.14.12
 Pillow==7.1.2
 django-storages==1.9.1
+kafka-python==2.0.1

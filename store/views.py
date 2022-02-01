@@ -8,8 +8,14 @@ from rest_framework import status
 
 from store.models import Product, Price, Order, Category, Client
 from store.serializers import (
-    ProductSerialization, PriceSerialization, OrderSerialization,
-    UserSerialization, CategorySerialization, ClientSerialization)
+    ProductSerialization,
+    PriceSerialization,
+    OrderSerialization,
+    UserSerialization,
+    CategorySerialization,
+    ClientSerialization,
+)
+from . import kafka_producer
 
 
 class ProductView(APIView):
@@ -50,7 +56,8 @@ class ProductView(APIView):
             raise Http404
 
         serializer = ProductSerialization(
-            product, data=request.data, partial=True, many=False)
+            product, data=request.data, partial=True, many=False
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -75,11 +82,12 @@ class OrderView(APIView):
     def post(self, request, format=None) -> Response:
 
         data = request.data.copy()
-        data['client'] = request.user.id
+        data["client"] = request.user.id
 
         serializers = OrderSerialization(data=data, many=False)
         if serializers.is_valid():
             serializers.save()
+            kafka_producer.send("order", serializers.data)
             return Response(serializers.data, status=status.HTTP_201_CREATED)
 
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -91,7 +99,9 @@ class OrderView(APIView):
                 order = Order.objects.get(id=pk, client=request.user)
                 serializer = OrderSerialization(order, many=False)
             else:
-                orders = Order.objects.filter(client=request.user).order_by('-created_at')
+                orders = Order.objects.filter(client=request.user).order_by(
+                    "-created_at"
+                )
                 serializer = OrderSerialization(orders, many=True)
         except:
             raise Http404
@@ -137,7 +147,8 @@ class ClientView(APIView):
             raise Http404
 
         serializer = ClientSerialization(
-            client, data=request.data, partial=True, many=False)
+            client, data=request.data, partial=True, many=False
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
